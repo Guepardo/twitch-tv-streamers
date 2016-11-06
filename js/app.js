@@ -24,15 +24,18 @@ $(document).ready(function() {
   // Channel information
   for (var i = 0; i < len; i++) {
     $.getJSON(channels[i], function(json) {
-      console.log("name: " + json.display_name);
-      console.log("logo: " + json.logo);
-      console.log("channel link: " + "https://www.twitch.tv/" + json.name);
+      $('.streams-wrapper').append("<div class=\"stream\"><img src='" + json.logo + "' alt='" + json.display_name + " logo'><div class=\"stream-info\"><p class=\"streamer-name\"><a href='https://www.twitch.tv/" + json.name + "'>" + json.display_name + "</a></p></div></div>");
+      // console.log("name: " + json.display_name);
+      // console.log("logo: " + json.logo);
+      // console.log("channel link: " + "https://www.twitch.tv/" + json.name);
     });
     // Stream information
     $.getJSON(streams[i], function(json) {
       if (json.stream !== null) {
-        console.log("game: " + json.stream.channel.game);
-        console.log("status: " + json.stream.channel.status);
+        $('.streams-wrapper').append("<div class=\"stream\"><img src='" + json.stream.channel.logo + "' alt='" + json.display_name + " logo'><div class=\"stream-info\"><p class=\"streamer-name\"><a href=" + json.stream.channel.url + ">" + json.stream.channel.display_name + "</a></p><p class=\"streamer-game\">" + json.stream.channel.game + "</p><p class=\"streamer-status\">" + json.stream.channel.status + "</p></div></div>");
+        // console.log(json);
+        // console.log("game: " + json.stream.channel.game);
+        // console.log("status: " + json.stream.channel.status);
       }
     });
   }
