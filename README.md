@@ -4,7 +4,6 @@
 This is a [freeCodeCamp](https://www.freecodecamp.com) challenge called [Use the Twitchtv JSON API](https://www.freecodecamp.com/challenges/use-the-twitchtv-json-api).  
 
 ## Where can I see it?
-// Click [here]() and check the completed challenge.
 **No link yet because the project is still under construction.**
 
 ## User Stories
