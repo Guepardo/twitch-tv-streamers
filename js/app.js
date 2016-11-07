@@ -30,7 +30,6 @@ function printOnline(o) {
 function printOffline(o) {
   for (var i = 0; i < len; i++) {
     if (!o[i].status) {
-      // Channel information
       $.getJSON(channels[i], function(json) {
         $('.streams-wrapper').append("<div class=\"stream\"><img src='" + json.logo + "' alt='" + json.display_name + " logo'><div class=\"stream-info\"><p class=\"streamer-name\"><a href='" + json.url + "'>" + json.display_name + " <i class=\"fa fa-circle-o-notch\" aria-hidden=\"true\"></i></a></p></div></div>");
       });
