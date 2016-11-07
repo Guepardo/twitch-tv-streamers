@@ -1,10 +1,4 @@
-/*
-Docs: https://dev.twitch.tv/docs
-Channel info: https://api.twitch.tv/kraken/channels/nomadtv?client_id=puyss7akb1pw4295zxh8m5bs2bxugrm
-Stream info: https://api.twitch.tv/kraken/streams/nomadtv?client_id=puyss7akb1pw4295zxh8m5bs2bxugrm
-*/
-
-var users     = ["nomadtv", "OgamingSC2", "chaotictabris", "freecodecamp", "storbeck", "blizzard", "RobotCaleb", "noobs2ninjas"];
+var users     = ["nomadtv", "OgamingSC2", "chaotictabris", "freecodecamp", "nvidiafrance", "blizzard", "RobotCaleb", "unitlost"];
 var key       = "?client_id=puyss7akb1pw4295zxh8m5bs2bxugrm";
 var channel   = "https://api.twitch.tv/kraken/channels/";
 var stream    = "https://api.twitch.tv/kraken/streams/";
@@ -15,25 +9,72 @@ var populated = 0;
 var len       = users.length;
 var interval;
 
-// TODO: Finish these functions
+// TODO: Work on the search function
+
+// Prints all channels information
 function printAll(o) {
-  console.log(o);
-  console.log(o[0].status);
-  console.log(o[1].status);
+  printOnline(o);
+  printOffline(o);
 };
 
-function printOnline(online) {
-
+// Prints online channels
+function printOnline(o) {
+  for (var i = 0; i < len; i++) {
+    if (online[i].status) {
+      $('.streams-wrapper').append("<div class=\"stream\"><img src='" + o[i].data.channel.logo + "' alt='" + o[i].data.display_name + " logo'><div class=\"stream-info\"><p class=\"streamer-name\"><a href=" + o[i].data.channel.url + ">" + o[i].data.channel.display_name + " <i class=\"fa fa-circle-o\" aria-hidden=\"true\"></i></a></p><p class=\"streamer-game\">" + o[i].data.channel.game + "</p><p class=\"streamer-status\">" + o[i].data.channel.status + "</p></div></div>");
+    }
+  }
 };
 
-function printOffline(online) {
-
+// Prints offline channels
+function printOffline(o) {
+  for (var i = 0; i < len; i++) {
+    if (!o[i].status) {
+      // Channel information
+      $.getJSON(channels[i], function(json) {
+        $('.streams-wrapper').append("<div class=\"stream\"><img src='" + json.logo + "' alt='" + json.display_name + " logo'><div class=\"stream-info\"><p class=\"streamer-name\"><a href='" + json.url + "'>" + json.display_name + " <i class=\"fa fa-circle-o-notch\" aria-hidden=\"true\"></i></a></p></div></div>");
+      });
+    }
+  }
 };
+
+// Prints all channels when 'all' link is clicked
+function clickAll(o) {
+  $(document).ready(function() {
+    $('#all').click(function() {
+      $('.stream').remove();
+      printAll(o);
+    });
+  });
+}
+
+// Prints online channels when 'online' link is clicked
+function clickOnline(o) {
+  $(document).ready(function() {
+    $('#online').click(function() {
+      $('.stream').remove();
+      printOnline(o);
+    });
+  });
+}
+
+// Prints offline channels when 'offline' link is clicked
+function clickOffline(o) {
+  $(document).ready(function() {
+    $('#offline').click(function() {
+      $('.stream').remove();
+      printOffline(o);
+    });
+  });
+}
 
 // Checks if array is fully populated
 interval = setInterval(function() {
   console.log('Testando o intervalo.');
   if (populated == len) {
+    clickAll(online);
+    clickOnline(online);
+    clickOffline(online);
     printAll(online);
     clearInterval(interval);
   }
@@ -45,9 +86,9 @@ for (var i = 0; i < len; i++) {
   streams[i]  = stream + users[i] + key;
 }
 
+// Checks which streams are online/offline and create the corresponding object
 $(document).ready(function() {
   for (var i = 0; i < len; i++) {
-    // Checks which streams are online/offline and create the corresponding object
     $.getJSON(streams[i]).done(function(json) {
       if (json.stream === null) {
         var user = {
@@ -65,15 +106,5 @@ $(document).ready(function() {
     }).always(function() {
       populated++;
     });
-
-    // Channel information
-    $.getJSON(channels[i], function(json) {
-      // Offline stream element
-      $('.streams-wrapper').append("<div class=\"stream\"><img src='" + json.logo + "' alt='" + json.display_name + " logo'><div class=\"stream-info\"><p class=\"streamer-name\"><a href='" + json.url + "'>" + json.display_name + "</a></p></div></div>");
-    });
   }
 });
-
-
-// This is the online stream element
-// $('.streams-wrapper').append("<div class=\"stream\"><img src='" + json.stream.channel.logo + "' alt='" + json.display_name + " logo'><div class=\"stream-info\"><p class=\"streamer-name\"><a href=" + json.stream.channel.url + ">" + json.stream.channel.display_name + "</a></p><p class=\"streamer-game\">" + json.stream.channel.game + "</p><p class=\"streamer-status\">" + json.stream.channel.status + "</p></div></div>");
