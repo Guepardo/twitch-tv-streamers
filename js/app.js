@@ -11,13 +11,14 @@ var stream    = "https://api.twitch.tv/kraken/streams/";
 var channels  = [];
 var streams   = [];
 var online    = [];
-var populated = false;
+var populated = 0;
 var len       = users.length;
 var interval;
 
 // TODO: Finish these functions
 function printAll(o) {
   console.log(o);
+  console.log(o[0].status);
   console.log(o[1].status);
 };
 
@@ -30,8 +31,9 @@ function printOffline(online) {
 };
 
 // Checks if array is fully populated
-interval = setInterval(function(){
-  if (populated) {
+interval = setInterval(function() {
+  console.log('Testando o intervalo.');
+  if (populated == len) {
     printAll(online);
     clearInterval(interval);
   }
@@ -45,9 +47,8 @@ for (var i = 0; i < len; i++) {
 
 $(document).ready(function() {
   for (var i = 0; i < len; i++) {
-
     // Checks which streams are online/offline and create the corresponding object
-    $.getJSON(streams[i], function(json) {
+    $.getJSON(streams[i]).done(function(json) {
       if (json.stream === null) {
         var user = {
           status : false,
@@ -61,19 +62,14 @@ $(document).ready(function() {
         };
         online.push(user);
       }
-
-      // TODO: Asynchronism is making this a nightmare
-      if (i == len - 1) {
-        populated = true;
-        console.log('yes');
-      }
+    }).always(function() {
+      populated++;
     });
 
     // Channel information
     $.getJSON(channels[i], function(json) {
       // Offline stream element
       $('.streams-wrapper').append("<div class=\"stream\"><img src='" + json.logo + "' alt='" + json.display_name + " logo'><div class=\"stream-info\"><p class=\"streamer-name\"><a href='" + json.url + "'>" + json.display_name + "</a></p></div></div>");
-      // console.log("channel link: " + "https://www.twitch.tv/" + json.name);
     });
   }
 });
