@@ -17,13 +17,91 @@
           <input type="text" placeholder="Search for a streamer...">
           <button type="button"><i class="fa fa-search" aria-hidden="true"></i></button>
         </div>
-        <div class="streams-wrapper"></div>
+        
+        <div class="streams-wrapper" id="app-vue">
+            <!-- Vue Template -->
+            <div class="stream" v-for="user in users">
+               <img v-bind:src="user.channel.logo" v-bind:alt="user.name" >
+               <div class="stream-info">
+                  <p class="streamer-name"><a v-bind:href="user.channel.url">{{user.channel.name}}<i class="fa fa-circle-o" aria-hidden="true"></i></a></p>
+                  <p class="streamer-game">{{user.channel.display_name }}</p>
+                  <p class="streamer-status">{{user.channel.status }}</p>
+               </div>
+            </div>
+            <!-- Vue Template end -->
+
+        </div>
+        
         <div class="footer">
           by <a href="">calaca</a>
         </div>
       </div>
       <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
       <script src="https://use.fontawesome.com/147694ed94.js"></script>
-      <script src="js/app.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.5/vue.js"></script>
+      <!-- <script src="js/app.js"></script> -->
+
+      <script>
+        new Vue({
+          el: '#app-vue', 
+
+          data:{
+            users: [], 
+            nameUsers: ['nomadtv', 'OgamingSC2', 'chaotictabris', 'freecodecamp', 'nvidiafrance', 'blizzard', 'RobotCaleb', 'unitlost'], 
+            apiKey: '?client_id=puyss7akb1pw4295zxh8m5bs2bxugrm', 
+            relativePath: 'https://api.twitch.tv/kraken/', 
+            count: 0, 
+            isLoading: true
+          }, 
+
+          created: function(){
+           this.updateUsers(); 
+          }, 
+
+          methods:{
+            getPathRequestChannels: function(userName){
+              return this.relativePath + 'channels/' + userName + this.apiKey; 
+            }, 
+
+            getPathRequestStreams: function(userName){
+              return this.relativePath + 'streams/' + userName + this.apiKey; 
+            }, 
+
+            extractName: function(url){
+              return url.substr( url.lastIndexOf('/') + 1 )
+            }, 
+
+            updateUsers: function(){
+              var self = this; 
+              for(var a = 0; a < this.nameUsers.length; a++){
+
+                $.get(this.getPathRequestChannels(this.nameUsers[a])).
+                done(function(data){
+
+                  var name = self.extractName(data._links.self); 
+
+                  setTimeout(function(){
+                    $.get(self.getPathRequestStreams(name)).
+                    done(function(sub_data){
+                       var user = {
+                            name   : name, 
+                            online : (sub_data.stream != null), 
+                            channel: data, 
+                            stream: sub_data.stream
+                        }; 
+                      self.users.push(user); 
+                    }); 
+                  }, 500); 
+
+                }); 
+
+              }
+
+            }, 
+
+          }, 
+        }); 
+      </script>
+
     </body>
 </html>
