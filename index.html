@@ -6,21 +6,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="css/app.css" rel="stylesheet">
     </head>
-    <body>
-      <div class="box-wrapper">
+    <body >
+      <div class="box-wrapper" id="app-vue">
         <div class="status-wrapper">
           <span id="all" class="status">All <i class="fa fa-users" aria-hidden="true"></i></span>
           <span id="online" class="status">Online <i class="fa fa-circle-o" aria-hidden="true"></i></span>
           <span id="offline" class="status">Offline <i class="fa fa-circle-o-notch" aria-hidden="true"></i></span>
         </div>
         <div class="search-wrapper">
-          <input type="text" placeholder="Search for a streamer...">
-          <button type="button"><i class="fa fa-search" aria-hidden="true"></i></button>
+          <input type="text" v-model="query" placeholder="Search for a streamer...">
+          <button type="button" v-on:click="updateUsers"><i class="fa fa-search" aria-hidden="true"></i></button>
         </div>
         
-        <div class="streams-wrapper" id="app-vue">
+        <div class="streams-wrapper">
             <!-- Vue Template -->
-            <div class="stream" v-for="user in users">
+            <div class="stream" v-for="user in usersComputed ">
                <img v-bind:src="user.channel.logo" v-bind:alt="user.name" >
                <div class="stream-info">
                   <p class="streamer-name"><a v-bind:href="user.channel.url">{{user.channel.name}}<i class="fa fa-circle-o" aria-hidden="true"></i></a></p>
@@ -50,8 +50,7 @@
             nameUsers: ['nomadtv', 'OgamingSC2', 'chaotictabris', 'freecodecamp', 'nvidiafrance', 'blizzard', 'RobotCaleb', 'unitlost'], 
             apiKey: '?client_id=puyss7akb1pw4295zxh8m5bs2bxugrm', 
             relativePath: 'https://api.twitch.tv/kraken/', 
-            count: 0, 
-            isLoading: true
+            query: ''
           }, 
 
           created: function(){
@@ -59,6 +58,10 @@
           }, 
 
           methods:{
+            listFilter: function(val){
+              return (val.stream != null); 
+            }, 
+
             getPathRequestChannels: function(userName){
               return this.relativePath + 'channels/' + userName + this.apiKey; 
             }, 
@@ -78,7 +81,7 @@
                 $.get(this.getPathRequestChannels(this.nameUsers[a])).
                 done(function(data){
 
-                  var name = self.extractName(data._links.self); 
+                  var name = self.extractName(data._links.self);
 
                   setTimeout(function(){
                     $.get(self.getPathRequestStreams(name)).
@@ -94,12 +97,25 @@
                   }, 500); 
 
                 }); 
-
               }
-
             }, 
-
           }, 
+
+          computed:{
+            usersComputed: function(){
+
+              if(this.query == '')
+                return this.users;
+
+              var aux = []; 
+
+              for(var a = 0; a < this.users.length; a++)
+                if(this.users[a].name.indexOf(this.query) != -1)
+                  aux.push(this.users[a]); 
+
+              return aux;
+            }
+          }
         }); 
       </script>
 
